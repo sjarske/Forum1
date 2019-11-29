@@ -39,7 +39,7 @@ namespace Logic
 
         public Post GetById(int id)
         {
-            throw new NotImplementedException();
+            return _context.GetById(id);
         }
 
         public IEnumerable<Post> GetFilteredPosts(string searchQuery)

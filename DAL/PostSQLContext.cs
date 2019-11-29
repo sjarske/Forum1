@@ -33,7 +33,61 @@ namespace DAL
 
         public Post GetById(int id)
         {
-            throw new NotImplementedException();
+            var post = new Post();
+            var replyList = new List<PostReply>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                SqlCommand command = new SqlCommand("spGetPostById", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                command.Parameters.Add(new SqlParameter("@Id", id));
+                command.ExecuteNonQuery();
+
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    post.Id = (int)reader["Id"];
+                    post.User.Id = (int)reader["UserId"];
+                    post.ForumId = (int)reader["ForumId"];
+                    post.Title = (string)reader["Title"];
+                    post.Content = (string)reader["Content"];
+                    post.Created = (DateTime)reader["Created"];
+                    post.Author = (string)reader["Author"];
+                };
+            }
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                SqlCommand command = new SqlCommand("spGetRepliesByPost", connection)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                command.Parameters.Add(new SqlParameter("@Id", id));
+                command.ExecuteNonQuery();
+
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    replyList.Add(new PostReply
+                    {
+                        Id = (int)reader["Id"],
+                        UserId = (int)reader["UserId"],
+                        PostId = (int)reader["PostId"],
+                        Content = (string)reader["Content"],
+                        Created = (DateTime)reader["Created"]
+                    });
+                }
+            }
+            post.Replies = replyList;
+            return post;
         }
 
         public IEnumerable<Post> GetFilteredPosts(string searchQuery)
@@ -63,10 +117,10 @@ namespace DAL
                     posts.Add(new Post
                     {
                         Id = (int)reader["Id"],
-                        ForumId= (int)reader["ForumId"],
-                        Created= (DateTime)reader["Created"],
-                        Title= (string)reader["Title"],
-                        Content=(string)reader["Content"]
+                        ForumId = (int)reader["ForumId"],
+                        Created = (DateTime)reader["Created"],
+                        Title = (string)reader["Title"],
+                        Content = (string)reader["Content"]
                     });
                 }
             }
