@@ -11,6 +11,31 @@ namespace DAL
     {
         private readonly string _connectionString = @"Server=mssql.fhict.local;Database=dbi389621_forum;User Id=dbi389621_forum;Password=sjors;";
 
+        public bool CheckLikeByUserId(int userid, int postid)
+        {
+            bool likedByUser = false;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                SqlCommand command = new SqlCommand("spCheckLikeByUserId", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add(new SqlParameter("@UserId", userid));
+                command.Parameters.Add(new SqlParameter("@PostId", postid));
+                command.ExecuteNonQuery();
+
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    likedByUser = true;
+                }
+                reader.Close();
+            }
+            return likedByUser;
+        }
+
         public void Create(Post post)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -83,6 +108,57 @@ namespace DAL
         public IEnumerable<Post> GetPostsByForum(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public int GetRatingById(int id)
+        {
+            int rating = 0;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                SqlCommand cmd = new SqlCommand("spGetRatingById", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@PostId", id));
+                cmd.ExecuteNonQuery();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    rating = (int)reader["Rating"];
+                }
+                reader.Close();
+                connection.Close();
+            }
+            return rating;
+        }
+
+        public void LikePost(int id, int userid)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("spLikePost", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@PostId", id));
+                cmd.Parameters.Add(new SqlParameter("@UserId", userid));
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void RemoveLike(int id, int userid)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("spRemoveLike", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@PostId", id));
+                cmd.Parameters.Add(new SqlParameter("@UserId", userid));
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 }

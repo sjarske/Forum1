@@ -17,6 +17,11 @@ namespace Logic
 
         }
 
+        public bool CheckLikeByUserId(int userid, int postid)
+        {
+            return _context.CheckLikeByUserId(userid, postid);
+        }
+
         public void Create(Post post)
         {
            _context.Create(post);
@@ -45,6 +50,20 @@ namespace Logic
         public IEnumerable<Post> GetFilteredPosts(string searchQuery)
         {
             throw new NotImplementedException();
+        }
+
+        public int GetRatingById(int id)
+        {
+            return _context.GetRatingById(id);
+        }
+        public void LikePost(int id, int userid)
+        {
+            _context.LikePost(id, userid);
+        }
+
+        public void RemoveLike(int id, int userid)
+        {
+            _context.RemoveLike(id, userid);
         }
     }
 }

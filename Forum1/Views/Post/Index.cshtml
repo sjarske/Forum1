@@ -18,6 +18,22 @@
             <p class="text-muted">
                 Posted by @Model.User.Username on @Model.Post.Created
             </p>
+            @if (Model.Rating == 0)
+            {
+                <p>Rating: Not rated yet</p>
+            }
+            else
+            {
+                <p>Rating: +@Model.Rating</p>
+            }
+            @if (!Model.RatedByUser)
+            {
+                <button onclick="LikePost(@Model.Post.Id)" type="button" class="btn btn-secondary">Like</button>
+            }
+            else
+            {
+                <button onclick="RemoveLike(@Model.Post.Id)" type="button" class="btn btn-secondary">Remove like</button>
+            }
         </div>
     </div>
 </div>
@@ -106,6 +122,40 @@ else
             type: "POST",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
+            success: function () {
+                console.log('Success!');
+                RefreshPage();
+            },
+            error: function() {
+                console.log('Error');
+                RefreshPage();
+            }
+        });
+    }
+
+    function LikePost(id) {
+        var controllerPath = '@Url.Action("LikePost", "Post")'
+        $.ajax({
+            url: controllerPath,
+            data: {'id':id} ,
+            type: "POST",
+            success: function () {
+                console.log('Success!');
+                RefreshPage();
+            },
+            error: function() {
+                console.log('Error');
+                RefreshPage();
+            }
+        });
+    }
+
+    function RemoveLike(id) {
+        var controllerPath = '@Url.Action("RemoveLike", "Post")'
+        $.ajax({
+            url: controllerPath,
+            data: {'id':id} ,
+            type: "POST",
             success: function () {
                 console.log('Success!');
                 RefreshPage();

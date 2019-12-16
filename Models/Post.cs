@@ -9,6 +9,7 @@ namespace Models
         public int Id { get; set; }
         public Forum Forum { get; set; }
         public User User { get; set; }
+        public Like Like { get; set; }
         public DateTime Created { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
@@ -20,6 +21,7 @@ namespace Models
             Replies = new List<PostReply>();
             User = new User();
             Forum = new Forum();
+            Like = new Like();
         }
     }
 }

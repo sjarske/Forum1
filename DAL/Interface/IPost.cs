@@ -14,5 +14,9 @@ namespace DAL
         void Create(Post post);
         void Delete(int id);
         Task EditPostContent(int id, string newContent);
+        void LikePost(int id, int userid);
+        int GetRatingById(int id);
+        bool CheckLikeByUserId(int userid, int postid);
+        void RemoveLike(int id, int userid);
     }
 }
