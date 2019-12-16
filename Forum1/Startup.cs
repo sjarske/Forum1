@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL;
+using DAL.Interface;
 using Logic;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -35,9 +37,20 @@ namespace Forum1
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/auth/login";
+                    options.AccessDeniedPath = "/auth/accesdenied";
+                });
+
+            services.AddDistributedMemoryCache();
+            services.AddSession();
 
             services.AddScoped<IForum, ForumLogic>();
             services.AddScoped<IPost, PostLogic>();
+            services.AddScoped<IUser, UserLogic>();
+            services.AddScoped<IPostReply, PostReplyLogic>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +70,8 @@ namespace Forum1
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseAuthentication();
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

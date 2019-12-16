@@ -17,14 +17,14 @@ namespace Logic
 
         }
 
-        public Task Add(Post post)
+        public void Create(Post post)
         {
-            throw new NotImplementedException();
+           _context.Create(post);
         }
 
-        public Task Delete(int id)
+        public void Delete(int id)
         {
-            throw new NotImplementedException();
+            _context.Delete(id);
         }
 
         public Task EditPostContent(int id, string newContent)
@@ -45,11 +45,6 @@ namespace Logic
         public IEnumerable<Post> GetFilteredPosts(string searchQuery)
         {
             throw new NotImplementedException();
-        }
-
-        public IEnumerable<Post> GetPostsByForum(int id)
-        {
-            return _context.GetPostsByForum(id);          
         }
     }
 }

@@ -1,0 +1,128 @@
+﻿@model Forum1.ViewModels.PostIndexModel
+
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<h3>This post is under the @Model.Forum.Title Forum!</h3>
+<br />
+<div class="col-md-12">
+    <div class="card flex-md-row mb-4 box-shadow h-md-250">
+        <div class="card-body d-flex flex-column align-items-start">
+            <strong class="d-inline-block mb-2 text-success">@Model.Forum.Title</strong>
+            <h3 class="mb-0">
+                <p>@Model.Post.Title</p>
+            </h3>
+            <p class="card-text mb-auto">@Model.Post.Content</p><br />
+            <p class="text-muted">
+                Posted by @Model.User.Username on @Model.Post.Created
+            </p>
+        </div>
+    </div>
+</div>
+<h3>Replies (@Model.Replies.Count()):</h3>
+@if (Model.Replies.Any())
+{
+    <br />
+    @foreach (var reply in Model.Replies)
+    {
+        <div class="col-md-12">
+            <div class="card flex-md-row mb-4 box-shadow h-md-250">
+                <div class="card-body d-flex flex-column align-items-start">
+                    <p class="card-text mb-auto">@reply.Content</p><br />
+                    <p class="text-muted">
+                        Posted by @reply.User.Username on @reply.Created
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+else
+{
+    <p>
+        It looks like there are no replies on this post yet. <br />
+        Why not Leave a reply?
+    </p>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+        Leave a reply
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Leave a reply</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="exampleFormControlTextarea1">Type your reply below</label>
+                        <textarea class="form-control" id="message" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" onclick="AddReply(@Model.Post.Id)" class="btn btn-primary">Post reply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div hidden="hidden" id="Alert" class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Wait a minute!</strong> Please login or register to leave a reply!
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="Alert()">
+        Leave a reply!
+    </button>
+}
+
+<script>
+    function AddReply(postId) {
+        var message = document.getElementById("message").value;
+        var postReply = {
+            'Content': message,
+            'PostId': postId
+        }
+        var controllerPath = '@Url.Action("Create", "PostReply")'
+        $.ajax({
+            url: controllerPath,
+            data: JSON.stringify(postReply),
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function () {
+                console.log('Success!');
+                RefreshPage();
+            },
+            error: function() {
+                console.log('Error');
+                RefreshPage();
+            }
+        });
+    }
+
+    function RefreshPage() {
+            window.location.reload()
+    }
+
+    function Alert() {
+       document.getElementById("Alert").hidden = false;
+    }
+</script>
+

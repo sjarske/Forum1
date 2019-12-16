@@ -49,59 +49,57 @@ namespace DAL
 
         public Forum GetById(int id)
         {
-            var forum = new Forum();
-            var postList = new List<Post>();
-
+            Forum forum = new Forum();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
-                SqlCommand command = new SqlCommand("spGetForumById", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-                command.Parameters.Add(new SqlParameter("@Id", id));
-                command.ExecuteNonQuery();
+                SqlCommand cmd = new SqlCommand("spGetForumById", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
+                cmd.ExecuteNonQuery();
 
-                var reader = command.ExecuteReader();
+                var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    forum.Id = (int)reader["Id"];
+                    forum.Id = id;
                     forum.Title = (string)reader["Title"];
                     forum.Description = (string)reader["Description"];
-                    forum.Created = (DateTime)reader["Created"];
-                    forum.ImageUrl = (string)reader["ImageUrl"];                 
+                    forum.ImageUrl = (string)reader["ImageUrl"];
                 }
+                return forum;
             }
+        }
+
+        public List<Post> GetPostsByForum(int id)
+        {
+            var newForum = new List<Post>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
-
-                SqlCommand command = new SqlCommand("spGetPostsByForumId", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-                command.Parameters.Add(new SqlParameter("@Id", id));
+                SqlCommand command = new SqlCommand("spGetPostsByForumId", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add(new SqlParameter("@id", id));
                 command.ExecuteNonQuery();
 
                 var reader = command.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    postList.Add(new Post
+                    newForum.Add(new Post
                     {
                         Id = (int)reader["Id"],
-                        ForumId= (int)reader["ForumId"],
-                        Title= (string)reader["Title"],
+                        Title = (string)reader["Title"],
+                        Created = (DateTime)reader["Created"],
                         Content = (string)reader["Content"],
-                        Created = (DateTime)reader["Created"]
+                        User = new User { Id = (int)reader["UserId"] },
+                        Forum = new Forum { Id = (int)reader["ForumId"] }
                     });
                 }
             }
-            forum.Posts = postList;
-            return forum;
+            return newForum;
         }
     }
 }

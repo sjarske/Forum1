@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL;
+using Forum1.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -21,59 +22,23 @@ namespace Forum1.Controllers
 
         public IActionResult Index()
         {
-            var forums = _forum.GetAll().Select(forum => new ForumListingModel {
-                Id = forum.Id,
-                Name = forum.Title,
-                Description = forum.Description
-            });
-
+            var forums = _forum.GetAll();
             var model = new ForumIndexModel
             {
-                ForumList = forums
+                ForumsList = forums
             };
             return View(model);
         }
 
-        public IActionResult Topic(int id)
+        public IActionResult Topic(Forum forum)
         {
-            var forum = _forum.GetById(id);
-            var posts = forum.Posts;
-
-            var postListings = posts.Select(post => new PostListingModel
+            var postsByForum = _forum.GetPostsByForum(forum.Id);
+            var model = new TopicViewModel
             {
-                Id= post.Id,
-                AuthorId=post.User.Id.ToString(),
-                Author= post.Author,
-                Title=post.Title,
-                DatePosted=post.Created.ToString(),
-                RepliesCount = post.Replies.Count(),
-                Forum = BuildForumListing(post)
-            });
-
-            var model = new ForumTopicModel  
-            {
-                Posts = postListings,
-                Forum = BuildForumListing(forum)
+                Forum = forum,
+                Posts = postsByForum
             };
-
             return View(model);
-        }
-
-        private ForumListingModel BuildForumListing(Post post)
-        {
-            var forum = post.Forum;
-            return BuildForumListing(forum);
-        }
-
-        private ForumListingModel BuildForumListing(Forum forum)
-        {
-            return new ForumListingModel
-            {
-                Id = forum.Id,
-                Name = forum.Title,
-                Description = forum.Description,
-                ImageUrl = forum.ImageUrl
-            };
         }
     }
 }

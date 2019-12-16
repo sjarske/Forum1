@@ -1,15 +1,15 @@
-﻿@model Models.ForumIndexModel
+﻿@model Forum1.ViewModels.ForumIndexModel
 
 <h1>Forums</h1>
 
 <table class="table table-hover" id="forumIndexTable">
     <tbody>
-        @foreach (var forum in Model.ForumList)
+        @foreach (var forum in Model.ForumsList)
         {
         <tr>
             <td>
-                <a asp-controller="Forum" asp-action="Topic" asp-route-id="@forum.Id">
-                    @forum.Name
+                <a href="@Url.Action("Topic", "Forum", forum)">
+                    @forum.Title
                 </a>
             </td>
             <td>

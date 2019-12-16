@@ -11,7 +11,11 @@ namespace Models
         public string Description { get; set; }
         public DateTime Created { get; set; }
         public string ImageUrl { get; set; }
-
         public virtual List<Post> Posts { get; set; }
+
+        public Forum()
+        {
+            Posts = new List<Post>();
+        }
     }
 }

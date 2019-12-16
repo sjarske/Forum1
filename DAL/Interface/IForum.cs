@@ -6,9 +6,9 @@ namespace DAL
 {
     public interface IForum
     {
-        Forum GetById(int id);
+        List<Post> GetPostsByForum(int id);
         IEnumerable<Forum> GetAll();
-
+        Forum GetById(int id);
         Task Create(Forum forum);
         Task Delete(int forumId);
     }

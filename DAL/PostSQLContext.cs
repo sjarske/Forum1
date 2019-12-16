@@ -11,14 +11,31 @@ namespace DAL
     {
         private readonly string _connectionString = @"Server=mssql.fhict.local;Database=dbi389621_forum;User Id=dbi389621_forum;Password=sjors;";
 
-        public Task Add(Post post)
+        public void Create(Post post)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand command = new SqlCommand("spCreatePost", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add(new SqlParameter("@ForumId", post.Forum.Id));
+                command.Parameters.Add(new SqlParameter("@Title", post.Title));
+                command.Parameters.Add(new SqlParameter("@UserId", post.User.Id));
+                command.Parameters.Add(new SqlParameter("@Content", post.Content));
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
         }
 
-        public Task Delete(int id)
+        public void Delete(int id)
         {
-            throw new NotImplementedException();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("spDeletePost", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public Task EditPostContent(int id, string newContent)
@@ -33,60 +50,28 @@ namespace DAL
 
         public Post GetById(int id)
         {
-            var post = new Post();
-            var replyList = new List<PostReply>();
-
+            Post post = new Post();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
-                SqlCommand command = new SqlCommand("spGetPostById", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-                command.Parameters.Add(new SqlParameter("@Id", id));
-                command.ExecuteNonQuery();
+                SqlCommand cmd = new SqlCommand("spGetPostById", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add(new SqlParameter("@Id", id));
+                cmd.ExecuteNonQuery();
 
-                var reader = command.ExecuteReader();
+                var reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
-                    post.Id = (int)reader["Id"];
-                    post.User.Id = (int)reader["UserId"];
-                    post.ForumId = (int)reader["ForumId"];
+                    post.Id = id;
                     post.Title = (string)reader["Title"];
                     post.Content = (string)reader["Content"];
                     post.Created = (DateTime)reader["Created"];
-                    post.Author = (string)reader["Author"];
-                };
-            }
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                SqlCommand command = new SqlCommand("spGetRepliesByPost", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-                command.Parameters.Add(new SqlParameter("@Id", id));
-                command.ExecuteNonQuery();
-
-                var reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    replyList.Add(new PostReply
-                    {
-                        Id = (int)reader["Id"],
-                        UserId = (int)reader["UserId"],
-                        PostId = (int)reader["PostId"],
-                        Content = (string)reader["Content"],
-                        Created = (DateTime)reader["Created"]
-                    });
+                    post.Forum.Id = (int)reader["ForumId"];
+                    post.User.Id = (int)reader["UserId"];
                 }
             }
-            post.Replies = replyList;
             return post;
         }
 
@@ -97,34 +82,7 @@ namespace DAL
 
         public IEnumerable<Post> GetPostsByForum(int id)
         {
-            var posts = new List<Post>();
-
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-
-                SqlCommand command = new SqlCommand("spGetPostsByForum", connection)
-                {
-                    CommandType = CommandType.StoredProcedure
-                };
-                command.Parameters.Add(new SqlParameter("@Id", id));
-                command.ExecuteNonQuery();
-
-                var reader = command.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    posts.Add(new Post
-                    {
-                        Id = (int)reader["Id"],
-                        ForumId = (int)reader["ForumId"],
-                        Created = (DateTime)reader["Created"],
-                        Title = (string)reader["Title"],
-                        Content = (string)reader["Content"]
-                    });
-                }
-            }
-            return posts;
+            throw new NotImplementedException();
         }
     }
 }
