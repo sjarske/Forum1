@@ -1,4 +1,5 @@
 ﻿using DAL.Interface;
+using Forum1.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -31,15 +32,18 @@ namespace Forum1.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(IFormCollection formCollection)
+        public IActionResult Register([Bind("Username, Password, Email")] RegisterViewModel userVM)
         {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
             User user = new User
             {
-                Username = formCollection["Username"],
-                Password = formCollection["Password"],
-                Email = formCollection["Email"]
+                Username = userVM.Username,
+                Password = userVM.Password,
+                Email = userVM.Email
             };
-
             _user.Register(user);
             return RedirectToAction("Index", "Home");
         }

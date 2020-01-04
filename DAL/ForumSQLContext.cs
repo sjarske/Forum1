@@ -72,14 +72,14 @@ namespace DAL
             }
         }
 
-        public List<Post> GetPostsByForum(int id)
+        public List<Post> GetAscDateSortedPostsByForum(int id)
         {
             var newForum = new List<Post>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
-                SqlCommand command = new SqlCommand("spGetPostsByForumId", connection);
+                SqlCommand command = new SqlCommand("spGetDateSortedPostsByForumId", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.Add(new SqlParameter("@id", id));
                 command.ExecuteNonQuery();
@@ -100,6 +100,41 @@ namespace DAL
                 }
             }
             return newForum;
+        }
+
+        public List<Post> GetDescDateSortedPostsByForum(int id)
+        {
+            var newForum = new List<Post>();
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand("spGetDescDateSortedPostsByForumId", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.Add(new SqlParameter("@id", id));
+                command.ExecuteNonQuery();
+
+                var reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    newForum.Add(new Post
+                    {
+                        Id = (int)reader["Id"],
+                        Title = (string)reader["Title"],
+                        Created = (DateTime)reader["Created"],
+                        Content = (string)reader["Content"],
+                        User = new User { Id = (int)reader["UserId"] },
+                        Forum = new Forum { Id = (int)reader["ForumId"] }
+                    });
+                }
+            }
+            return newForum;
+        }
+
+        public List<Post> GetRatingSortedPostsByForum(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -9,6 +9,19 @@
 @if (Model.Posts.Any())
 {
     <p>Currently there are @Model.Posts.Count() posts on this forum</p>
+    <div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="">
+            <a href="@Url.Action("SortByDateDesc", "Forum", Model.Forum)">
+                <button type="button" class="btn btn-secondary">Newest first</button>
+                <a />
+                <a href="@Url.Action("SortByDateAsc", "Forum", Model.Forum)">
+                    <button type="button" class="btn btn-secondary">Oldest first</button>
+                </a>
+        </div>
+        <a href="@Url.Action("SortByRating", "Forum", Model.Forum)">
+            <button type="button" class="btn btn-secondary">Highest rated</button>
+        </a>
+    </div>
     <br />
     @foreach (var post in Model.Posts)
     {
@@ -70,7 +83,7 @@ else
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="basic-addon1">Whats your post about?</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Title" aria-label="Title" id="Title" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" placeholder="Title" aria-label="Title" id="Title" aria-describedby="basic-addon1" required>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -104,27 +117,32 @@ else
     function CreatePost(forumId) {
         var message = document.getElementById("message").value;
         var title = document.getElementById("Title").value;
-        var post = {
-            'Content': message,
-            'ForumId': forumId,
-            'Title': title
-        }
-        var controllerPath = '@Url.Action("Create", "Post")'
-        $.ajax({
-            url: controllerPath,
-            data: JSON.stringify(post),
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function () {
-                console.log('Success!');
-                RefreshPage();
-            },
-            error: function() {
-                console.log('Error');
-                RefreshPage();
+        if (title != "" && message != "") {
+            var post = {
+                'Content': message,
+                'ForumId': forumId,
+                'Title': title
             }
-        });
+            var controllerPath = '@Url.Action("Create", "Post")'
+            $.ajax({
+                url: controllerPath,
+                data: JSON.stringify(post),
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function () {
+                    console.log('Success!');
+                    RefreshPage();
+                },
+                error: function () {
+                    console.log('Error');
+                    RefreshPage();
+                }
+            });
+        }
+        else {
+            alert("Please populate all fields");
+        }
     }
 
     function DeletePost(id) {

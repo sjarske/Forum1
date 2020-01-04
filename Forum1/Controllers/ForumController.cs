@@ -32,13 +32,40 @@ namespace Forum1.Controllers
 
         public IActionResult Topic(Forum forum)
         {
-            var postsByForum = _forum.GetPostsByForum(forum.Id);
+            return SortByDateAsc(forum);
+        }
+
+        public IActionResult SortByDateAsc(Forum forum)
+        {
+            var sortedPostsByForum = _forum.GetAscDateSortedPostsByForum(forum.Id);
             var model = new TopicViewModel
             {
                 Forum = forum,
-                Posts = postsByForum
+                Posts = sortedPostsByForum
             };
-            return View(model);
+            return View("Topic",model);
+        }
+
+        public IActionResult SortByDateDesc(Forum forum)
+        {
+            var sortedPostsByForum = _forum.GetDescDateSortedPostsByForum(forum.Id);
+            var model = new TopicViewModel
+            {
+                Forum = forum,
+                Posts = sortedPostsByForum
+            };
+            return View("Topic", model);
+        }
+
+        public IActionResult SortByRating(Forum forum)
+        {
+            var sortedPostsByForum = _forum.GetRatingSortedPostsByForum(forum.Id);
+            var model = new TopicViewModel
+            {
+                Forum = forum,
+                Posts = sortedPostsByForum
+            };
+            return View("Topic", model);
         }
     }
 }

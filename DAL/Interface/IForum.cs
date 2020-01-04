@@ -6,10 +6,12 @@ namespace DAL
 {
     public interface IForum
     {
-        List<Post> GetPostsByForum(int id);
         IEnumerable<Forum> GetAll();
         Forum GetById(int id);
         Task Create(Forum forum);
         Task Delete(int forumId);
+        List<Post> GetAscDateSortedPostsByForum(int id);
+        List<Post> GetDescDateSortedPostsByForum(int id);
+        List<Post> GetRatingSortedPostsByForum(int id);
     }
 }

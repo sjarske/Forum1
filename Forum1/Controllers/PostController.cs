@@ -28,9 +28,18 @@ namespace Forum1.Controllers
 
         public IActionResult Index(int id)
         {
+            int userid;
             var identity = (ClaimsIdentity)User.Identity;
             IEnumerable<Claim> claims = identity.Claims;
-            int userid = int.Parse(claims.ElementAt(2).Value); 
+            try
+            {
+                userid = int.Parse(claims.ElementAt(2).Value);
+            }
+            catch (Exception)
+            {
+
+                userid = 0;
+            }
             var post = _post.GetById(id);
             var user = _user.GetById(post.User.Id);
             var forum = _forum.GetById(post.Forum.Id);
@@ -83,7 +92,7 @@ namespace Forum1.Controllers
             return View();
         }
 
-        public IActionResult GetAllPosts()
+        public IActionResult GetAll()
         {
             return View();
         }

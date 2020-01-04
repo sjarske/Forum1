@@ -26,13 +26,16 @@
             {
                 <p>Rating: +@Model.Rating</p>
             }
-            @if (!Model.RatedByUser)
+            @if (User.Identity.IsAuthenticated)
             {
-                <button onclick="LikePost(@Model.Post.Id)" type="button" class="btn btn-secondary">Like</button>
-            }
-            else
-            {
-                <button onclick="RemoveLike(@Model.Post.Id)" type="button" class="btn btn-secondary">Remove like</button>
+                @if (!Model.RatedByUser)
+                {
+                    <button onclick="LikePost(@Model.Post.Id)" type="button" class="btn btn-secondary">Like</button>
+                }
+                else
+                {
+                    <button onclick="RemoveLike(@Model.Post.Id)" type="button" class="btn btn-secondary">Remove like</button>
+                }
             }
         </div>
     </div>
@@ -46,6 +49,10 @@
         <div class="col-md-12">
             <div class="card flex-md-row mb-4 box-shadow h-md-250">
                 <div class="card-body d-flex flex-column align-items-start">
+                    @if (@Model.User.Username == @reply.User.Username)
+                    {
+                        <p style="color:gold">By OP</p>
+                    }
                     <p class="card-text mb-auto">@reply.Content</p><br />
                     <p class="text-muted">
                         Posted by @reply.User.Username on @reply.Created
@@ -111,26 +118,31 @@ else
 <script>
     function AddReply(postId) {
         var message = document.getElementById("message").value;
-        var postReply = {
-            'Content': message,
-            'PostId': postId
-        }
-        var controllerPath = '@Url.Action("Create", "PostReply")'
-        $.ajax({
-            url: controllerPath,
-            data: JSON.stringify(postReply),
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function () {
-                console.log('Success!');
-                RefreshPage();
-            },
-            error: function() {
-                console.log('Error');
-                RefreshPage();
+        if (message != "") {
+            var postReply = {
+                'Content': message,
+                'PostId': postId
             }
-        });
+            var controllerPath = '@Url.Action("Create", "PostReply")'
+            $.ajax({
+                url: controllerPath,
+                data: JSON.stringify(postReply),
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function () {
+                    console.log('Success!');
+                    RefreshPage();
+                },
+                error: function () {
+                    console.log('Error');
+                    RefreshPage();
+                }
+            });
+        }
+        else {
+            alert("Please enter a valid reply");
+        }
     }
 
     function LikePost(id) {
